@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:music_player/neu_box.dart';
 import 'package:music_player/pages/song_page.dart';
 import 'package:music_player/style/theme_color.dart';
+import 'package:music_player/widgets/list_box.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -10,13 +11,35 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
+  TabController? tabController;
+  bool tapTab = false;
+
   tapToPlay() {
     Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => SongPage(),
         ));
+  }
+
+  onTapSlideTab() {
+    tapTab = true;
+    setState(() {});
+    Future.delayed(
+      Duration(milliseconds: 400),
+      () {
+        tapTab = false;
+        setState(() {});
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -29,8 +52,10 @@ class _MainPageState extends State<MainPage> {
       //   centerTitle: true,
       // ),
       backgroundColor: ColorPalette.backgroundColor,
+      floatingActionButton: playBar(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: SafeArea(
-          child: ListView(
+          child: Column(
         children: [
           // SizedBox(
           //   height: 20,
@@ -46,10 +71,80 @@ class _MainPageState extends State<MainPage> {
           // SizedBox(
           //   height: 15,
           // ),
-          horizonList(),
-          verList(),
+          AnimatedContainer(
+            duration: Duration(milliseconds: 350),
+            margin: EdgeInsets.only(top: 15),
+            height: 40,
+            child: TabBar(
+                controller: tabController,
+                indicatorColor: Colors.white,
+                indicatorSize: TabBarIndicatorSize.label,
+                indicatorWeight: 5,
+                labelColor: Colors.grey.shade600,
+                unselectedLabelColor: Colors.white,
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                onTap: (value) {
+                  onTapSlideTab();
+                },
+                indicator: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(15),
+                    border: tapTab == true
+                        ? Border.all(color: Colors.grey.shade200, width: 1)
+                        : null,
+                    boxShadow: [
+                      BoxShadow(
+                        color: tapTab == true
+                            ? ColorPalette.backgroundColor
+                            : Colors.grey.shade500,
+                        blurRadius: tapTab == true ? 17 : 15,
+                        offset: tapTab == true ? Offset(2, 2) : Offset(5, 5),
+                      ),
+                      BoxShadow(
+                        color: tapTab == true
+                            ? ColorPalette.backgroundColor
+                            : Colors.white,
+                        blurRadius: tapTab == true ? 17 : 15,
+                        offset:
+                            tapTab == true ? Offset(-2, -2) : Offset(-5, -5),
+                      )
+                    ]),
+                tabs: [
+                  Tab(
+                    text: '   All list   ',
+                  ),
+                  Tab(
+                    text: '   Album   ',
+                  ),
+                  Tab(
+                    text: '   Artist   ',
+                  ),
+                ]),
+          ),
+          Flexible(
+            child: TabBarView(controller: tabController, children: [
+              allList(),
+              allList(),
+              allList(),
+            ]),
+          )
         ],
       )),
+    );
+  }
+
+  // Widget customLoadIndicator(){
+  //   return Container(
+
+  //   )
+  // }
+
+  Widget allList() {
+    return ListView(
+      children: [
+        horizonList(),
+        verList(),
+      ],
     );
   }
 
@@ -62,6 +157,7 @@ class _MainPageState extends State<MainPage> {
           children: [
             Flexible(
               child: TextField(
+                autofocus: false,
                 decoration: InputDecoration(
                     hintText: 's e a r c h',
                     border: InputBorder.none,
@@ -138,58 +234,77 @@ class _MainPageState extends State<MainPage> {
       padding: EdgeInsets.symmetric(horizontal: 15),
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          child: NeuBox(
-              child: Row(
-            children: [
-              Container(
-                height: 80,
-                width: 80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.grey.shade400,
-                ),
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'music title',
-                      maxLines: 2,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                    Text(
-                      'artist',
-                      maxLines: 2,
-                      style: TextStyle(fontSize: 15, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {},
-                child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: Center(child: Icon(Icons.more_vert_rounded))),
-              ),
-              SizedBox(
-                width: 5,
-              )
-            ],
-          )),
+        return ListBox(
+          title: 'Music',
+          artist: 'artist',
+          onTap: () {},
         );
       },
+    );
+  }
+
+  Widget playBar() {
+    return Container(
+      height: 60,
+      width: MediaQuery.of(context).size.width * 0.95,
+      // padding: const EdgeInsets.all(5.0),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return SongPage();
+            },
+          ));
+        },
+        child: NeuBox(
+            child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+                child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.grey.shade400,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Music',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    Text('Artist'),
+                  ],
+                ),
+              ],
+            )),
+            Expanded(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: () {},
+                  child: Icon(Icons.skip_previous_rounded),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Icon(Icons.play_arrow_rounded),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Icon(Icons.skip_next_rounded),
+                ),
+              ],
+            ))
+          ],
+        )),
+      ),
     );
   }
 }
