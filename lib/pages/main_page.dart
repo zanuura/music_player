@@ -39,7 +39,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 6, vsync: this);
   }
 
   @override
@@ -68,20 +68,22 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             height: 8,
           ),
           searchBar(),
-          // SizedBox(
-          //   height: 15,
-          // ),
+          SizedBox(
+            height: 5,
+          ),
           AnimatedContainer(
             duration: Duration(milliseconds: 350),
-            margin: EdgeInsets.only(top: 15),
-            height: 40,
+            height: 65,
+            color: Colors.transparent,
             child: TabBar(
+                padding: EdgeInsets.fromLTRB(8, 10, 8, 15),
                 controller: tabController,
                 indicatorColor: Colors.white,
                 indicatorSize: TabBarIndicatorSize.label,
                 indicatorWeight: 5,
                 labelColor: Colors.grey.shade600,
                 unselectedLabelColor: Colors.white,
+                isScrollable: true,
                 overlayColor: MaterialStateProperty.all(Colors.transparent),
                 onTap: (value) {
                   onTapSlideTab();
@@ -97,21 +99,28 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         color: tapTab == true
                             ? ColorPalette.backgroundColor
                             : Colors.grey.shade500,
-                        blurRadius: tapTab == true ? 17 : 15,
-                        offset: tapTab == true ? Offset(2, 2) : Offset(5, 5),
+                        blurRadius: tapTab == true ? 10 : 10,
+                        offset: tapTab == true ? Offset(2, 2) : Offset(4, 4),
                       ),
                       BoxShadow(
                         color: tapTab == true
                             ? ColorPalette.backgroundColor
                             : Colors.white,
-                        blurRadius: tapTab == true ? 17 : 15,
+                        blurRadius: tapTab == true ? 10 : 10,
                         offset:
-                            tapTab == true ? Offset(-2, -2) : Offset(-5, -5),
+                            tapTab == true ? Offset(-2, -2) : Offset(-4, -4),
                       )
                     ]),
                 tabs: [
+                  //favorit, daftar putar, trek, album, artist, folder
                   Tab(
-                    text: '   All list   ',
+                    text: '   Favorit   ',
+                  ),
+                  Tab(
+                    text: '   Daftar putar   ',
+                  ),
+                  Tab(
+                    text: '   Trek   ',
                   ),
                   Tab(
                     text: '   Album   ',
@@ -119,10 +128,16 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   Tab(
                     text: '   Artist   ',
                   ),
+                  Tab(
+                    text: '   Folder   ',
+                  ),
                 ]),
           ),
           Flexible(
             child: TabBarView(controller: tabController, children: [
+              allList(),
+              allList(),
+              allList(),
               allList(),
               allList(),
               allList(),
@@ -189,7 +204,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             child: Container(
               width: 200,
               height: 200,
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 25),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 20),
               child: NeuBox(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
